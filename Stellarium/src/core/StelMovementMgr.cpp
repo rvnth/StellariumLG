@@ -129,7 +129,19 @@ void StelMovementMgr::init()
 		}
 	}
 
-	Communicate::instance().connect(Communicate::SERVER);
+	QString mode = conf->value("lg/mode","").toString();
+	int lgoffset = conf->value("lg/offset",0).toInt();
+	if (!mode.isEmpty()) {
+		if (mode == "SERVER") {
+			Communicate::instance().setMode(Communicate::SERVER);
+			Communicate::instance().connect(lgoffset);
+		} else if (mode == "CLIENT") {
+			Communicate::instance().setMode(Communicate::CLIENT);
+			Communicate::instance().connect(lgoffset);
+		} else 
+			Communicate::instance().setMode(Communicate::NONE);
+	} else
+		Communicate::instance().setMode(Communicate::NONE);
 
 	QString movementGroup = N_("Movement and Selection");
 	addAction("actionSwitch_Equatorial_Mount", N_("Miscellaneous"), N_("Switch between equatorial and azimuthal mount"), "equatorialMount", "Ctrl+M");

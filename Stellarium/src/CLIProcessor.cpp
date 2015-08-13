@@ -120,6 +120,8 @@ void CLIProcessor::parseCLIArgsPostConfig(const QStringList& argList, QSettings*
 	float fov;
 	QString landscapeId, homePlanet, longitude, latitude, skyDate, skyTime;
 	QString projectionType, screenshotDir, multiresImage, startupScript;
+	QString lgmode;
+	int lgoffset;
 	try
 	{
 		bool dumpOpenGLDetails = argsGetOption(argList, "-d", "--dump-opengl-details");
@@ -137,6 +139,8 @@ void CLIProcessor::parseCLIArgsPostConfig(const QStringList& argList, QSettings*
 		screenshotDir = argsGetOptionWithArg(argList, "", "--screenshot-dir", "").toString();
 		multiresImage = argsGetOptionWithArg(argList, "", "--multires-image", "").toString();
 		startupScript = argsGetOptionWithArg(argList, "", "--startup-script", "").toString();
+		lgmode = argsGetOptionWithArg(argList, "", "--lg", "").toString();
+		lgoffset = argsGetOptionWithArg(argList, "", "--lg-offset", 0).toInt();
 	}
 	catch (std::runtime_error& e)
 	{
@@ -154,6 +158,10 @@ void CLIProcessor::parseCLIArgsPostConfig(const QStringList& argList, QSettings*
 	if (altitude!=-1) confSettings->setValue("location_run_once/altitude", altitude);
 	if (!longitude.isEmpty()) confSettings->setValue("location_run_once/longitude", StelUtils::getDecAngle(longitude)); // Store longitude in radian
 	if (!latitude.isEmpty()) confSettings->setValue("location_run_once/latitude", StelUtils::getDecAngle(latitude)); // Store latitude in radian
+	if (!lgmode.isEmpty()) {
+		confSettings->setValue("lg/mode", lgmode.toUpper());
+		confSettings->setValue("lg/lgoffset", lgoffset);
+	}
 
 	if (!skyDate.isEmpty() || !skyTime.isEmpty())
 	{

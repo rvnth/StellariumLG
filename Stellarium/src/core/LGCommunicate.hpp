@@ -11,6 +11,7 @@
 class Communicate {
 	public:
 		enum MODE {
+			NONE,
 			SERVER,
 			CLIENT
 		};
@@ -22,7 +23,9 @@ class Communicate {
 		bool viewchanged;
 		bool listening;
 		std::mutex mtx;
+
 		MODE mode;
+		int offset;
 
 		zmq::context_t* ctx;; 
 		zmq::socket_t* s;
@@ -32,7 +35,6 @@ class Communicate {
 		std::ofstream file;
 		std::ifstream ifile;
 		int t;
-//		double fov;
 		bool comm;
 		std::string filename;
 
@@ -45,7 +47,8 @@ class Communicate {
 			static Communicate c("rstream");
 			return c;
 		}
-		void connect (MODE m);
+		void setMode (MODE m) { mode = m; }
+		void connect (int offset);
 	
 		void write (double f);
 		void write (Vec3d v);

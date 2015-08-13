@@ -27,8 +27,8 @@ Communicate::~Communicate () {
 	s->close();
 }
 
-void Communicate::connect (MODE m) {
-	mode = m;
+void Communicate::connect (int _offset) {
+	offset = _offset;
 	s->connect ("tcp://127.0.0.1:5050");
 
 	std::stringstream data;
@@ -142,7 +142,7 @@ bool Communicate::read (StelMovementMgr* smm) {
 		if(viewchanged) {
 			smm->setViewDirectionJ2000(viewdirection);
 			smm->setCFov(fov);
-			smm->setViewDirectionJ2000WithOffset(1);
+			smm->setViewDirectionJ2000WithOffset(offset);
 			viewchanged = false;
 			mtx.unlock();
 			return true;
