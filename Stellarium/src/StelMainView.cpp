@@ -123,6 +123,7 @@ void StelSkyItem::onSizeChanged()
 	StelApp::getInstance().glWindowHasBeenResized(x(), y(), width(), height());
 }
 
+
 void StelSkyItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
 	Q_UNUSED(option);
@@ -148,6 +149,7 @@ void StelSkyItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 	QPointF pos = event->scenePos();
 	pos.setY(height() - 1 - pos.y());
 	QMouseEvent newEvent(QEvent::MouseButtonPress, QPoint(pos.x(), pos.y()), event->button(), event->buttons(), event->modifiers());
+
 	StelApp::getInstance().handleClick(&newEvent);
 }
 
@@ -984,7 +986,7 @@ void StelMainView::moveEvent(QMoveEvent * event)
 	Q_UNUSED(event);
 
 	// We use the glWidget instead of the even, as we want the screen that shows most of the widget.
-	StelApp::getInstance().setDevicePixelsPerPixel(glWidget->windowHandle()->devicePixelRatio());
+//	StelApp::getInstance().setDevicePixelsPerPixel(glWidget->windowHandle()->devicePixelRatio());
 }
 
 void StelMainView::closeEvent(QCloseEvent* event)

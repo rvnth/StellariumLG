@@ -31,6 +31,11 @@ SET(MINIMAL_QT_VERSION "5.3.0")
 
 # Use customized cmake macros
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+#SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -lzmq")
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lzmq" )
+#SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lzmq")
+#SET(CMAKE_VERBOSE_MAKEFILE on)
+
 
 ########### Main global variables ###########
 IF(NOT CMAKE_BUILD_TYPE)
@@ -77,7 +82,7 @@ IF(WIN32)
   ENDIF()
 ELSE()
   SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wno-unused-parameter")
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter -Wno-unused-result")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter -Wno-unused-result -std=c++11")
 ENDIF()
 
 IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")

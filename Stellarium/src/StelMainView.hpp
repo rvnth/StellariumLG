@@ -78,6 +78,7 @@ public:
 	QGraphicsWidget* getGuiWidget() const {return guiWidget;}
 	//! Return mouse position coordinates
 	QPoint getMousePos();
+
 public slots:
 
 	//!	Set whether fullscreen is activated or not

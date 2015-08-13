@@ -193,6 +193,7 @@ public:
 
 	//! Set vision direction
 	void lookAtJ2000(const Vec3d& pos, const Vec3d& up);
+	void lookAtJ2000WithOffset(const Vec3d& pos, const Vec3d& aup, int loc);
 
 	Vec3d altAzToEquinoxEqu(const Vec3d& v, RefractionMode refMode=RefractionAuto) const;
 	Vec3d equinoxEquToAltAz(const Vec3d& v, RefractionMode refMode=RefractionAuto) const;

@@ -571,6 +571,36 @@ void StelCore::lookAtJ2000(const Vec3d& pos, const Vec3d& aup)
 	invertMatAltAzModelView = matAltAzModelView.inverse();
 }
 
+void StelCore::lookAtJ2000WithOffset(const Vec3d& pos, const Vec3d& aup, int loc)
+{
+	Vec3d f(j2000ToAltAz(pos, RefractionOff));
+	Vec3d up(j2000ToAltAz(aup, RefractionOff));
+	f.normalize();
+	up.normalize();
+
+	// Update the model view matrix
+	Vec3d s(f^up);	// y vector
+	s.normalize();
+	Vec3d u(s^f);	// Up vector in AltAz coordinates
+	u.normalize();
+
+	// Compute offset f and s vector
+	double hfov = movementMgr->getCurrentFov() * (double)currentProjectorParams.viewportXywh[2] / (double)currentProjectorParams.viewportXywh[3] * M_PI/180.;
+	double cv = cos((double)loc*hfov);
+	double sv = sin((double)loc*hfov);
+	Vec3d f1(u[0]*u.dot(f)*(1-cv) + f[0]*cv + (u[1]*f[2]-u[2]*f[1])*sv,
+		 u[1]*u.dot(f)*(1-cv) + f[1]*cv + (u[2]*f[0]-u[0]*f[2])*sv,
+		 u[2]*u.dot(f)*(1-cv) + f[2]*cv + (u[0]*f[1]-u[1]*f[0])*sv);
+	Vec3d s1(f1^u);
+
+	matAltAzModelView.set(s1[0],u[0],-f1[0],0.,
+			      s1[1],u[1],-f1[1],0.,
+			      s1[2],u[2],-f1[2],0.,
+			      0.,0.,0.,1.);
+	invertMatAltAzModelView = matAltAzModelView.inverse();
+}
+
+
 Vec3d StelCore::altAzToEquinoxEqu(const Vec3d& v, RefractionMode refMode) const
 {
 	if (refMode==RefractionOff || skyDrawer==NULL || (refMode==RefractionAuto && skyDrawer->getFlagHasAtmosphere()==false))

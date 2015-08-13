@@ -1,3 +1,4 @@
+SET(extLinkerOption ${extLinkerOption} -lzmq)
 SET(glues_lib_SRCS
 	core/external/glues_stel/source/glues_error.c
 	core/external/glues_stel/source/glues_error.h
@@ -66,6 +67,8 @@ SET(stellarium_lib_SRCS
 	core/StelGeodesicGrid.hpp
 	core/StelMovementMgr.cpp
 	core/StelMovementMgr.hpp
+	core/LGCommunicate.cpp
+	core/LGCommunicate.hpp
 	core/StelObserver.cpp
 	core/StelObserver.hpp
 	core/StelLocation.hpp
