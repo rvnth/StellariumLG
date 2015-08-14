@@ -896,9 +896,10 @@ void StelMovementMgr::setViewDirectionJ2000(const Vec3d& v)
 	viewDirectionJ2000 = v;
 	viewDirectionMountFrame = j2000ToMountFrame(v);
 }
-void StelMovementMgr::setViewDirectionJ2000WithOffset(const Vec3d& v, int loc)
+void StelMovementMgr::setViewDirectionJ2000WithOffset(int loc)
 {
 	Vec3d& v1 = viewDirectionJ2000;
+	std::cout << "STORED VAL = " << v1[0] << ", " << v1[1] << ", " << v1[2] << std::endl;
 	core->lookAtJ2000WithOffset(v1, getViewUpVectorJ2000(), loc);
 //	viewDirectionJ2000 = v;
 //	viewDirectionMountFrame = j2000ToMountFrame(v);
@@ -928,7 +929,7 @@ void StelMovementMgr::panView(double deltaAz, double deltaAlt)
 		StelUtils::spheToRect(azVision, altVision, tmp);
 		setViewDirectionJ2000(mountFrameToJ2000(tmp));
 		// Communicate::instance().write(1, mountFrameToJ2000(tmp));
-		Communicate::instance().write1(mountFrameToJ2000(tmp));
+		Communicate::instance().write(mountFrameToJ2000(tmp));
 	}
 }
 
@@ -1015,7 +1016,7 @@ void StelMovementMgr::changeFov(double deltaFov)
 	if (deltaFov) {
 		setFov(currentFov + deltaFov);
 		// Communicate::instance().write(1, currentFov);
-		Communicate::instance().write1(currentFov);
+		Communicate::instance().write(currentFov);
 	}
 }
 

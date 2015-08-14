@@ -595,7 +595,9 @@ void StelCore::lookAtJ2000WithOffset(const Vec3d& pos, const Vec3d& aup, int loc
 	Vec3d f1(u[0]*u.dot(f)*(1-cv) + f[0]*cv + (u[1]*f[2]-u[2]*f[1])*sv,
 		 u[1]*u.dot(f)*(1-cv) + f[1]*cv + (u[2]*f[0]-u[0]*f[2])*sv,
 		 u[2]*u.dot(f)*(1-cv) + f[2]*cv + (u[0]*f[1]-u[1]*f[0])*sv);
+	f1.normalize();
 	Vec3d s1(f1^u);
+	s1.normalize();
 
 	matAltAzModelView.set(s1[0],u[0],-f1[0],0.,
 			      s1[1],u[1],-f1[1],0.,

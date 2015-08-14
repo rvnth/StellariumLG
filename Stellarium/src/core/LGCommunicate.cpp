@@ -37,7 +37,7 @@ Communicate::~Communicate () {
 }
 
 void Communicate::connect (int _offset) {
-	offset = 0; //_offset;
+	offset = _offset;
 	s->connect ("tcp://127.0.0.1:5000");
 
 	std::stringstream data;
@@ -248,11 +248,11 @@ void Communicate::listen () {
 				datass >> viewdirection[0] >> viewdirection[1] >> viewdirection[2] >> id;
 				if (id==1) {
 					vd1 = true;
-					datass >> viewdirection1[0] >> viewdirection1[1] >> viewdirection1[2] >> id;
+					datass >> viewdirection[0] >> viewdirection[1] >> viewdirection[2] >> id;
 				}
 				if (id==2) {
 					f1 = true;
-					datass >> fov1 >> id;
+					datass >> fov >> id;
 				}
 				if (id==3)
 					datass >> fov;
@@ -276,16 +276,16 @@ bool Communicate::read (StelMovementMgr* smm) {
 		mtx.lock();
 		if(viewchanged) {
 			smm->setViewDirectionJ2000(viewdirection);
-			if (f1) {
-				smm->setCFov(fov1);
-				f1 = false;
-			}
-			if (vd1) {
-				smm->setViewDirectionJ2000(viewdirection1);
-				vd1=false;
-			}
+//			if (f1) {
+//				smm->setCFov(fov1);
+//				f1 = false;
+//			}
+//			if (vd1) {
+//				smm->setViewDirectionJ2000(viewdirection);
+//				vd1=false;
+//			}
 			smm->setCFov(fov);
-			smm->setViewDirectionJ2000WithOffset(viewdirection, offset);
+			smm->setViewDirectionJ2000WithOffset(offset);
 			viewchanged = false;
 			mtx.unlock();
 			return true;
