@@ -102,17 +102,30 @@ void Communicate::write (Vec3d v) {
 		viewdirection = v;
 }
 
+int sc = 0;
+
 void Communicate::send () {
 	if (mode!=SERVER)
 		return;
-	unsigned char data [33];
+	unsigned char data [34];
+	sc = (sc+1)%255;
 	data[0] = 1;
-	memcpy(&data[1], &viewdirection[0], sizeof(double));
+	data[33] = sc;
+/*	data[1] == viewdirection[0] & 0xff;
+	data[2] == (viewdirection[0] >> 8) & 0xff;
+	data[3] == (viewdirection[0] >> 16) & 0xff;
+	data[4] == (viewdirection[0] >> 24)& 0xff;
+	data[4] == (viewdirection[0] >> 24)& 0xff;
+	data[4] == (viewdirection[0] >> 24)& 0xff;
+	data[4] == (viewdirection[0] >> 24)& 0xff;
+	data[4] == (viewdirection[0] >> 24)& 0xff;
+	data[4] == (viewdirection[0] >> 24)& 0xff;
+*/	memcpy(&data[1], &viewdirection[0], sizeof(double));
 	memcpy(&data[9], &viewdirection[1], sizeof(double));
 	memcpy(&data[17], &viewdirection[2], sizeof(double));
 	memcpy(&data[25], &fov, sizeof(double));
 
-				for (int i=0; i<33; i++)
+				for (int i=0; i<34; i++)
 					std::cout << (int)data[i] << ", ";
 				std::cout << std::endl;
 	zmq::message_t mssg (33);
@@ -131,10 +144,10 @@ void Communicate::listen () {
 	while (listening) {
 		zmq::message_t mssg;
 		s->recv (&mssg, 0);
-		std::cout << "INDEX: " << (int)(((char*)mssg.data())[0]) << std::endl;
-		switch(((char*)mssg.data())[0]) {
+		std::cout << "INDEX: " << (int)(((unsigned char*)mssg.data())[0]) << std::endl;
+		switch(((unsigned char*)mssg.data())[0]) {
 			case 1:
-				char* data = (char*)mssg.data();
+				unsigned char* data = (unsigned char*)mssg.data();
 				mtx.lock();
 				memcpy(&viewdirection[0], &data[1], sizeof(double));
 				memcpy(&viewdirection[1], &data[9], sizeof(double));
@@ -142,7 +155,7 @@ void Communicate::listen () {
 				memcpy(&fov, &data[25], sizeof(double));
 				viewchanged = true;
 				mtx.unlock();
-				for (int i=0; i<33; i++)
+				for (int i=0; i<34; i++)
 					std::cout << (int)data[i] << ", ";
 				std::cout << std::endl;
 				std::cout<<"Listening: "<< viewdirection[0] << ", "<< viewdirection[1] << ", " << viewdirection[2] << " ... " << fov << std::endl;
