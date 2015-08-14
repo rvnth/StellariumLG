@@ -111,6 +111,10 @@ void Communicate::send () {
 	memcpy(&data[9], &viewdirection[1], sizeof(double));
 	memcpy(&data[17], &viewdirection[2], sizeof(double));
 	memcpy(&data[25], &fov, sizeof(double));
+
+				for (int i=0; i<33; i++)
+					std::cout << (int)data[i] << ", ";
+				std::cout << std::endl;
 	zmq::message_t mssg (33);
 	memcpy ((void*)mssg.data(), data, 33);
 	s->send (mssg);
@@ -127,16 +131,21 @@ void Communicate::listen () {
 	while (listening) {
 		zmq::message_t mssg;
 		s->recv (&mssg, 0);
+		std::cout << "INDEX: " << (int)(((char*)mssg.data())[0]) << std::endl;
 		switch(((char*)mssg.data())[0]) {
-			case 0:
+			case 1:
 				char* data = (char*)mssg.data();
 				mtx.lock();
-				memcpy(&data[1], &viewdirection[0], sizeof(double));
-				memcpy(&data[9], &viewdirection[1], sizeof(double));
-				memcpy(&data[17], &viewdirection[2], sizeof(double));
-				memcpy(&data[25], &fov, sizeof(double));
+				memcpy(&viewdirection[0], &data[1], sizeof(double));
+				memcpy(&viewdirection[1], &data[9], sizeof(double));
+				memcpy(&viewdirection[2], &data[17], sizeof(double));
+				memcpy(&fov, &data[25], sizeof(double));
 				viewchanged = true;
 				mtx.unlock();
+				for (int i=0; i<33; i++)
+					std::cout << (int)data[i] << ", ";
+				std::cout << std::endl;
+				std::cout<<"Listening: "<< viewdirection[0] << ", "<< viewdirection[1] << ", " << viewdirection[2] << " ... " << fov << std::endl;
 				break;
 		}
 	}
@@ -146,19 +155,19 @@ bool Communicate::read (StelMovementMgr* smm) {
 	if (mode!=CLIENT)
 		return false;
 	if (mtx.try_lock()) {
-		if(viewchanged) {
+		if(true || viewchanged) {
 			smm->setViewDirectionJ2000(viewdirection);
 			smm->setCFov(fov);
-			smm->setViewDirectionJ2000WithOffset(offset);
+			smm->setViewDirectionJ2000WithOffset(0);//offset);
 			viewchanged = false;
 			mtx.unlock();
 			return true;
 		} else {
 			mtx.unlock();
-			return false;
+			return true;
 		}
 	} else
-		return false;
+		return true;
 }
 
 void Communicate::read (int i, StelMovementMgr* smm) {
