@@ -115,12 +115,36 @@ void Communicate::send () {
 	data[2] == (viewdirection[0] >> 8) & 0xff;
 	data[3] == (viewdirection[0] >> 16) & 0xff;
 	data[4] == (viewdirection[0] >> 24)& 0xff;
-	data[4] == (viewdirection[0] >> 24)& 0xff;
-	data[4] == (viewdirection[0] >> 24)& 0xff;
-	data[4] == (viewdirection[0] >> 24)& 0xff;
-	data[4] == (viewdirection[0] >> 24)& 0xff;
-	data[4] == (viewdirection[0] >> 24)& 0xff;
-*/	memcpy(&data[1], &viewdirection[0], sizeof(double));
+	data[5] == (viewdirection[0] >> 32)& 0xff;
+	data[6] == (viewdirection[0] >> 40)& 0xff;
+	data[7] == (viewdirection[0] >> 48)& 0xff;
+	data[8] == (viewdirection[0] >> 56)& 0xff;
+	data[9] == viewdirection[1] & 0xff;
+	data[10] == (viewdirection[1] >> 8) & 0xff;
+	data[11] == (viewdirection[1] >> 16) & 0xff;
+	data[12] == (viewdirection[1] >> 24)& 0xff;
+	data[13] == (viewdirection[1] >> 32)& 0xff;
+	data[14] == (viewdirection[1] >> 40)& 0xff;
+	data[15] == (viewdirection[1] >> 48)& 0xff;
+	data[16] == (viewdirection[1] >> 56)& 0xff;
+	data[17] == viewdirection[2] & 0xff;
+	data[18] == (viewdirection[2] >> 8) & 0xff;
+	data[19] == (viewdirection[2] >> 16) & 0xff;
+	data[20] == (viewdirection[2] >> 24)& 0xff;
+	data[21] == (viewdirection[2] >> 32)& 0xff;
+	data[22] == (viewdirection[2] >> 40)& 0xff;
+	data[23] == (viewdirection[2] >> 48)& 0xff;
+	data[24] == (viewdirection[2] >> 56)& 0xff;
+	data[25] == fov & 0xff;
+	data[26] == (fov >> 8)& 0xff;
+	data[27] == (fov >> 16)& 0xff;
+	data[28] == (fov >> 24)& 0xff;
+	data[29] == (fov >> 32)& 0xff;
+	data[30] == (fov >> 40)& 0xff;
+	data[31] == (fov >> 48)& 0xff;
+	data[32] == (fov >> 56)& 0xff;
+*/
+	memcpy(&data[1], &viewdirection[0], sizeof(double));
 	memcpy(&data[9], &viewdirection[1], sizeof(double));
 	memcpy(&data[17], &viewdirection[2], sizeof(double));
 	memcpy(&data[25], &fov, sizeof(double));
@@ -128,8 +152,8 @@ void Communicate::send () {
 				for (int i=0; i<34; i++)
 					std::cout << (int)data[i] << ", ";
 				std::cout << std::endl;
-	zmq::message_t mssg (33);
-	memcpy ((void*)mssg.data(), data, 33);
+	zmq::message_t mssg (34);
+	memcpy ((void*)mssg.data(), data, 34);
 	s->send (mssg);
 
 	// if (fov > 0);
@@ -149,6 +173,7 @@ void Communicate::listen () {
 			case 1:
 				unsigned char* data = (unsigned char*)mssg.data();
 				mtx.lock();
+
 				memcpy(&viewdirection[0], &data[1], sizeof(double));
 				memcpy(&viewdirection[1], &data[9], sizeof(double));
 				memcpy(&viewdirection[2], &data[17], sizeof(double));
