@@ -203,7 +203,7 @@ void Communicate::send () {
 	}
 	datass << "3 " << fov << " ";
 
-	std::cout << "1 " << viewdirection[0] << " " << viewdirection[1] << " " << viewdirection[2] << " " << fov << std::endl;
+	std::cout << "100 " << viewdirection[0] << " " << viewdirection[1] << " " << viewdirection[2] << " " << fov << std::endl;
 	
 	zmq::message_t mssg (datass.str().length());
 	memcpy ((void*)mssg.data(), datass.str().c_str(), datass.str().length());
@@ -284,7 +284,7 @@ bool Communicate::read (StelMovementMgr* smm) {
 				vd1=false;
 			}
 			smm->setCFov(fov);
-			smm->setViewDirectionJ2000WithOffset(offset);
+			smm->setViewDirectionJ2000WithOffset(1);//offset);
 			viewchanged = false;
 			mtx.unlock();
 			return true;

@@ -926,7 +926,7 @@ void StelMovementMgr::panView(double deltaAz, double deltaAlt)
 		StelUtils::spheToRect(azVision, altVision, tmp);
 		setViewDirectionJ2000(mountFrameToJ2000(tmp));
 		// Communicate::instance().write(1, mountFrameToJ2000(tmp));
-		Communicate::instance().write(mountFrameToJ2000(tmp));
+		Communicate::instance().write1(mountFrameToJ2000(tmp));
 	}
 }
 
@@ -990,8 +990,8 @@ void StelMovementMgr::updateAutoZoom(double deltaTime)
 			flagAutoZoom = 0;
 			setFov(zoomMove.aim);
 		}
-		Communicate::instance().write(currentFov);
 	}
+	Communicate::instance().write(currentFov);
 	// Communicate::instance().write(3, currentFov);
 }
 
@@ -1013,7 +1013,7 @@ void StelMovementMgr::changeFov(double deltaFov)
 	if (deltaFov) {
 		setFov(currentFov + deltaFov);
 		// Communicate::instance().write(1, currentFov);
-		Communicate::instance().write(currentFov);
+		Communicate::instance().write1(currentFov);
 	}
 }
 
