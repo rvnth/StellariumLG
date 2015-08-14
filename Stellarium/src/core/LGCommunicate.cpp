@@ -173,7 +173,7 @@ void Communicate::send () {
 	s->send (mssg);
 */
 	std::stringstream datass;
-	datass << "1 " << viewdirection[0] << " " << viewdirection[1] << " " << viewdirection[2] << " " << fov;
+	datass << "1 " << viewdirection[0] << " " << viewdirection[1] << " " << viewdirection[2] << " " << fov << " ";
 	std::cout << "1 " << viewdirection[0] << " " << viewdirection[1] << " " << viewdirection[2] << " " << fov << std::endl;
 	
 	zmq::message_t mssg (datass.str().length());
@@ -192,13 +192,15 @@ void Communicate::listen () {
 	while (listening) {
 		zmq::message_t mssg;
 		s->recv (&mssg, 0);
-		std::cout << "INDEX: " << (int)(((unsigned char*)mssg.data())[0]) << std::endl;
-		switch(((unsigned char*)mssg.data())[0]) {
+		char* data = (char*)mssg.data();
+		std::string datas(data);
+		std::stringstream datass(datas);
+		int mid;
+		datass >> mid;
+		std::cout << "INDEX: " << mid << std::endl;
+//		switch(((unsigned char*)mssg.data())[0]) {
+		switch(mid) {
 			case 1:
-				char* data = (char*)mssg.data();
-				std::string datas(data);
-				std::stringstream datass(datas);
-				int id;
 				mtx.lock();
 
 /*				viewdirection[0] = data[1] + (data[2] << 8) + (data[3] << 16) + (data[4] << 24) + (data[5] << 32) + (data[6] << 40) + (data[7] << 48) + (data[8] << 56);
@@ -212,14 +214,14 @@ void Communicate::listen () {
 				memcpy(&viewdirection[2], &data[17], sizeof(double));
 				memcpy(&fov, &data[25], sizeof(double));
 */
-				datass >> id >> viewdirection[0] >> viewdirection[1] >> viewdirection[2] >> fov;
+				datass >> viewdirection[0] >> viewdirection[1] >> viewdirection[2] >> fov;
 
 				viewchanged = true;
 				mtx.unlock();
-				std::cout << "DOUBLE: " << sizeof(double) << std::endl;
-				for (int i=0; i<34; i++)
-					std::cout << (int)data[i] << ", ";
-				std::cout << std::endl;
+//				std::cout << "DOUBLE: " << sizeof(double) << std::endl;
+//				for (int i=0; i<34; i++)
+//					std::cout << (int)data[i] << ", ";
+//				std::cout << std::endl;
 				std::cout<<"Listening: "<< viewdirection[0] << ", "<< viewdirection[1] << ", " << viewdirection[2] << " ... " << fov << std::endl;
 				break;
 		}
@@ -233,7 +235,7 @@ bool Communicate::read (StelMovementMgr* smm) {
 		if(true || viewchanged) {
 			smm->setViewDirectionJ2000(viewdirection);
 			smm->setCFov(fov);
-			smm->setViewDirectionJ2000WithOffset(0);//offset);
+			smm->setViewDirectionJ2000WithOffset(offset);
 			viewchanged = false;
 			mtx.unlock();
 			return true;
