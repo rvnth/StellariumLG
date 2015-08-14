@@ -161,8 +161,8 @@ void Communicate::send () {
 	memcpy(&v3[2], &data[17], sizeof(double));
 	memcpy(&fv, &data[25], sizeof(double));
 
-	std::cout << "SENDING: " << viewdirection[0] << ", " << viewdirection[1] << ", " << viewdirection[2] << " ... " << fov << std::endl
-	std::cout << "SENT:    " << v3[0] << ", " << v3[1] << ", " << v3[2] << " ... " << fv << std::endl
+	std::cout << "SENDING: " << viewdirection[0] << ", " << viewdirection[1] << ", " << viewdirection[2] << " ... " << fov << std::endl;
+	std::cout << "SENT:    " << v3[0] << ", " << v3[1] << ", " << v3[2] << " ... " << fv << std::endl;
 
 
 	zmq::message_t mssg (34);
@@ -187,18 +187,17 @@ void Communicate::listen () {
 				unsigned char* data = (unsigned char*)mssg.data();
 				mtx.lock();
 
-				viewdirection[0] = data[1] + (data[2] << 8) + (data[3] << 16) + (data[4] << 24) + (data[5] << 32) + (data[6] << 40) + (data[7] << 48) + (data[8] << 56);
+/*				viewdirection[0] = data[1] + (data[2] << 8) + (data[3] << 16) + (data[4] << 24) + (data[5] << 32) + (data[6] << 40) + (data[7] << 48) + (data[8] << 56);
 				viewdirection[1] = data[9] + (data[10] << 8) + (data[11] << 16) + (data[12] << 24) + (data[13] << 32) + (data[14] << 40) + (data[15] << 48) + (data[16] << 56);
 				viewdirection[2] = data[17] + (data[18] << 8) + (data[19] << 16) + (data[20] << 24) + (data[21] << 32) + (data[22] << 40) + (data[23] << 48) + (data[24] << 56);
 				fov = data[24] + (data[26] << 8) + (data[27] << 16) + (data[28] << 24) + (data[29] << 32) + (data[30] << 40) + (data[31] << 48) + (data[32] << 56);
+*/
 
-/*
-	memcpy(&data[1], &viewdirection[0], sizeof(double));
 				memcpy(&viewdirection[0], &data[1], sizeof(double));
 				memcpy(&viewdirection[1], &data[9], sizeof(double));
 				memcpy(&viewdirection[2], &data[17], sizeof(double));
 				memcpy(&fov, &data[25], sizeof(double));
-*/				viewchanged = true;
+				viewchanged = true;
 				mtx.unlock();
 				std::cout << "DOUBLE: " << sizeof(double) << std::endl;
 				for (int i=0; i<34; i++)
