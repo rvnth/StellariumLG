@@ -107,11 +107,11 @@ int sc = 0;
 void Communicate::send () {
 	if (mode!=SERVER)
 		return;
-	unsigned char data [34];
+/*	unsigned char data [34];
 	sc = (sc+1)%255;
 	data[0] = 1;
 	data[33] = sc;
-/*	data[1] = viewdirection[0] & 0xff;
+	data[1] = viewdirection[0] & 0xff;
 	data[2] = (viewdirection[0] >> 8) & 0xff;
 	data[3] = (viewdirection[0] >> 16) & 0xff;
 	data[4] = (viewdirection[0] >> 24)& 0xff;
@@ -144,7 +144,7 @@ void Communicate::send () {
 	data[31] = (fov >> 48)& 0xff;
 	data[32] = (fov >> 56)& 0xff;
 */
-	memcpy(&data[1], &viewdirection[0], sizeof(double));
+/*	memcpy(&data[1], &viewdirection[0], sizeof(double));
 	memcpy(&data[9], &viewdirection[1], sizeof(double));
 	memcpy(&data[17], &viewdirection[2], sizeof(double));
 	memcpy(&data[25], &fov, sizeof(double));
@@ -168,6 +168,13 @@ void Communicate::send () {
 	zmq::message_t mssg (34);
 	memcpy ((void*)mssg.data(), data, 34);
 	s->send (mssg);
+*/
+	std::stringstream datass;
+	datass << "1 " << viewdirection[0] << " " << viewdirection[1] << " " << viewdirection[2] << " " << fov;
+	
+	zmq::message_t mssg (datass.str().length());
+	memcpy ((void*)mssg.data(), datass.str().c_str(), datass.str().length());
+	s->send (mssg);
 
 	// if (fov > 0);
 	// create prime message 00000002
@@ -184,7 +191,10 @@ void Communicate::listen () {
 		std::cout << "INDEX: " << (int)(((unsigned char*)mssg.data())[0]) << std::endl;
 		switch(((unsigned char*)mssg.data())[0]) {
 			case 1:
-				unsigned char* data = (unsigned char*)mssg.data();
+				char* data = (char*)mssg.data();
+				std::string datas(data);
+				std::stringstream datass(datas);
+				int id;
 				mtx.lock();
 
 /*				viewdirection[0] = data[1] + (data[2] << 8) + (data[3] << 16) + (data[4] << 24) + (data[5] << 32) + (data[6] << 40) + (data[7] << 48) + (data[8] << 56);
@@ -192,11 +202,14 @@ void Communicate::listen () {
 				viewdirection[2] = data[17] + (data[18] << 8) + (data[19] << 16) + (data[20] << 24) + (data[21] << 32) + (data[22] << 40) + (data[23] << 48) + (data[24] << 56);
 				fov = data[24] + (data[26] << 8) + (data[27] << 16) + (data[28] << 24) + (data[29] << 32) + (data[30] << 40) + (data[31] << 48) + (data[32] << 56);
 */
-
+/*
 				memcpy(&viewdirection[0], &data[1], sizeof(double));
 				memcpy(&viewdirection[1], &data[9], sizeof(double));
 				memcpy(&viewdirection[2], &data[17], sizeof(double));
 				memcpy(&fov, &data[25], sizeof(double));
+*/
+				datass >> id >> viewdirection[0] >> viewdirection[1] >> viewdirection[2] >> fov;
+
 				viewchanged = true;
 				mtx.unlock();
 				std::cout << "DOUBLE: " << sizeof(double) << std::endl;
