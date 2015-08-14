@@ -95,7 +95,7 @@ void Communicate::write (int i, double f) {
 void Communicate::write (double f) {
 	if (mode==SERVER) {
 		fov = f;
-		cout << "Setting fov = " << fov << " == " << f << endl;
+		std::cout << "Setting fov = " << fov << " == " << f << std::endl;
 	}
 }
 
@@ -173,7 +173,7 @@ void Communicate::send () {
 */
 	std::stringstream datass;
 	datass << "1 " << viewdirection[0] << " " << viewdirection[1] << " " << viewdirection[2] << " " << fov;
-	std::cout << "1 " << viewdirection[0] << " " << viewdirection[1] << " " << viewdirection[2] << " " << fov << endl;
+	std::cout << "1 " << viewdirection[0] << " " << viewdirection[1] << " " << viewdirection[2] << " " << fov << std::endl;
 	
 	zmq::message_t mssg (datass.str().length());
 	memcpy ((void*)mssg.data(), datass.str().c_str(), datass.str().length());
