@@ -990,9 +990,9 @@ void StelMovementMgr::updateAutoZoom(double deltaTime)
 			flagAutoZoom = 0;
 			setFov(zoomMove.aim);
 		}
+		Communicate::instance().write(currentFov);
 	}
 	// Communicate::instance().write(3, currentFov);
-	// Communicate::instance().write(currentFov);
 }
 
 // Zoom to the given field of view
