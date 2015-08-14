@@ -171,9 +171,10 @@ void Communicate::send () {
 */
 	std::stringstream datass;
 	datass << "1 " << viewdirection[0] << " " << viewdirection[1] << " " << viewdirection[2] << " " << fov;
+	std::cout << "1 " << viewdirection[0] << " " << viewdirection[1] << " " << viewdirection[2] << " " << fov;
 	
-	zmq::message_t mssg (datass.str().length()+2);
-	memcpy ((void*)mssg.data(), datass.str().c_str(), datass.str().length()+2);
+	zmq::message_t mssg (datass.str().length());
+	memcpy ((void*)mssg.data(), datass.str().c_str(), datass.str().length());
 	s->send (mssg);
 
 	// if (fov > 0);
