@@ -1,5 +1,10 @@
 #include "LGCommunicate.hpp"
 
+void ListenerThread::run()
+{
+	Communicate::instance().listen();
+}
+
 Communicate::Communicate (std::string _prefix) {
 	MAX_EVENTS = 300;
 	current = 0;
@@ -12,6 +17,7 @@ Communicate::Communicate (std::string _prefix) {
 
 	ctx = new zmq::context_t(1); 
 	s = new zmq::socket_t(*ctx, ZMQ_PAIR);
+	Listener = new ListenerThread;
 
 
 	// Create thread for listen
@@ -23,19 +29,20 @@ Communicate::Communicate (std::string _prefix) {
 
 Communicate::~Communicate () { 
 	listening = false;
-	s->disconnect ("tcp://127.0.0.1:5050");
+	s->disconnect ("tcp://127.0.0.1:5000");
 	s->close();
 }
 
 void Communicate::connect (int _offset) {
 	offset = _offset;
-	s->connect ("tcp://127.0.0.1:5050");
+	s->connect ("tcp://127.0.0.1:5000");
 
 	std::stringstream data;
 	data<<"Stellarium Connection Established";
 	zmq::message_t mssg (data.str().length()+1);
 	memcpy ((void*)mssg.data(), (void *)data.str().c_str(), data.str().length()+1);
 	s->send (mssg);
+	Listener->start();
 }
 
 //static Communicate& Communicate::instance () {

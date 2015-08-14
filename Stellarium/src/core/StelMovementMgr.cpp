@@ -559,7 +559,7 @@ void StelMovementMgr::updateMotion(double deltaTime)
 {
 	if( Communicate::instance().read(this) )
 		return;
-	Communicate::instance().read(0,this);
+	//Communicate::instance().read(0,this);
 	//Communicate::instance().read(1,this);
 //	return;
 	updateVisionVector(deltaTime);

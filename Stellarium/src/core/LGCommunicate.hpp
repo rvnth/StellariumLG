@@ -1,12 +1,21 @@
 #include "StelMovementMgr.hpp"
 #include <zmq.hpp>
 #include <mutex>
+#include <QThread>
 
 #include <iostream>
 #include <sys/stat.h>
 #include <string>
 #include <sstream>
 #include <fstream>
+
+class ListenerThread : public QThread
+{
+	    Q_OBJECT
+
+	protected:
+		        void run();
+};
 
 class Communicate {
 	public:
@@ -29,6 +38,7 @@ class Communicate {
 
 		zmq::context_t* ctx;; 
 		zmq::socket_t* s;
+		ListenerThread* Listener;
 
 		int current, MAX_EVENTS;
 		std::string prefix;
