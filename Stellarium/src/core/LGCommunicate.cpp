@@ -37,7 +37,7 @@ Communicate::~Communicate () {
 }
 
 void Communicate::connect (int _offset) {
-	offset = _offset;
+	offset = 0; //_offset;
 	s->connect ("tcp://127.0.0.1:5000");
 
 	std::stringstream data;
@@ -272,8 +272,9 @@ void Communicate::listen () {
 bool Communicate::read (StelMovementMgr* smm) {
 	if (mode!=CLIENT)
 		return false;
-	if (mtx.try_lock()) {
-		if(true || viewchanged) {
+	if (true) {
+		mtx.lock();
+		if(viewchanged) {
 			smm->setViewDirectionJ2000(viewdirection);
 			if (f1) {
 				smm->setCFov(fov1);
@@ -284,16 +285,17 @@ bool Communicate::read (StelMovementMgr* smm) {
 				vd1=false;
 			}
 			smm->setCFov(fov);
-			smm->setViewDirectionJ2000WithOffset(1);//offset);
+			smm->setViewDirectionJ2000WithOffset(viewdirection, offset);
 			viewchanged = false;
 			mtx.unlock();
 			return true;
 		} else {
+			std::cout << "VIEW DIR NOT AVAILABLE !!!" << std::endl;
 			mtx.unlock();
-			return true;
+			return false;
 		}
 	} else
-		return true;
+		return false;
 }
 
 void Communicate::read (int i, StelMovementMgr* smm) {
@@ -354,7 +356,7 @@ void Communicate::read (int i, StelMovementMgr* smm) {
 		recvss >> fov;
 
 		smm->setCFov(fov);
-		smm->setViewDirectionJ2000WithOffset(1);
+//		smm->setViewDirectionJ2000WithOffset(1);
 		//cout << "Recvd1 " << fov << endl;
 	}
 

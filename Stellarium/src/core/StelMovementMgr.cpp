@@ -896,10 +896,12 @@ void StelMovementMgr::setViewDirectionJ2000(const Vec3d& v)
 	viewDirectionJ2000 = v;
 	viewDirectionMountFrame = j2000ToMountFrame(v);
 }
-void StelMovementMgr::setViewDirectionJ2000WithOffset(int loc)
+void StelMovementMgr::setViewDirectionJ2000WithOffset(const Vec3d& v, int loc)
 {
-	Vec3d& v = viewDirectionJ2000;
-	core->lookAtJ2000WithOffset(v, getViewUpVectorJ2000(), loc);
+	Vec3d& v1 = viewDirectionJ2000;
+	core->lookAtJ2000WithOffset(v1, getViewUpVectorJ2000(), loc);
+//	viewDirectionJ2000 = v;
+//	viewDirectionMountFrame = j2000ToMountFrame(v);
 }
 
 
