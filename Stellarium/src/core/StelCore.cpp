@@ -583,9 +583,13 @@ void StelCore::lookAtJ2000WithOffset(const Vec3d& pos, const Vec3d& aup, int loc
 	s.normalize();
 	Vec3d u(s^f);	// Up vector in AltAz coordinates
 	u.normalize();
+/*	matAltAzModelView.set(s[0],u[0],-f[0],0.,
+			      s[1],u[1],-f[1],0.,
+			      s[2],u[2],-f[2],0.,
+			      0.,0.,0.,1.);
 
 	// Compute offset f and s vector
-	double hfov = movementMgr->getCurrentFov() * (double)currentProjectorParams.viewportXywh[2] / (double)currentProjectorParams.viewportXywh[3] * M_PI/180.;
+*/	double hfov = movementMgr->getCurrentFov() * (double)currentProjectorParams.viewportXywh[2] / (double)currentProjectorParams.viewportXywh[3] * M_PI/180.;
 	double cv = cos((double)loc*hfov);
 	double sv = sin((double)loc*hfov);
 	Vec3d f1(u[0]*u.dot(f)*(1-cv) + f[0]*cv + (u[1]*f[2]-u[2]*f[1])*sv,

@@ -15,6 +15,9 @@ Communicate::Communicate (std::string _prefix) {
 	viewchanged = false;
 	listening = true;
 
+	vd1 = false;
+	f1 = false;
+
 	ctx = new zmq::context_t(1); 
 	s = new zmq::socket_t(*ctx, ZMQ_PAIR);
 	Listener = new ListenerThread;
@@ -92,11 +95,26 @@ void Communicate::write (int i, double f) {
 	s->send (req);
 }
 
+void Communicate::write1 (double f) {
+	if (mode==SERVER) {
+		fov1 = f;
+		f1 = true;
+		std::cout << "Setting fov1 = " << fov1 << std::endl;
+	}
+}
+
 void Communicate::write (double f) {
 	std::cout << "Mode is " << mode << std::endl;
 	if (mode==SERVER) {
 		fov = f;
 		std::cout << "Setting fov = " << fov << " == " << f << std::endl;
+	}
+}
+
+void Communicate::write1 (Vec3d v) {
+	if (mode==SERVER) {
+		viewdirection1 = v;
+		vd1 = true;
 	}
 }
 
@@ -173,7 +191,18 @@ void Communicate::send () {
 	s->send (mssg);
 */
 	std::stringstream datass;
-	datass << "1 " << viewdirection[0] << " " << viewdirection[1] << " " << viewdirection[2] << " " << fov << " ";
+//	datass << "1 " << viewdirection[0] << " " << viewdirection[1] << " " << viewdirection[2] << " " << fov << " ";
+	datass << "1 " << viewdirection[0] << " " << viewdirection[1] << " " << viewdirection[2] << " ";
+	if (vd1) {
+		datass << "1 " << viewdirection1[0] << " " << viewdirection1[1] << " " << viewdirection1[2] << " ";
+		vd1 = false;
+	}
+	if (f1) {
+		datass << "2 " << fov1 << " ";
+		f1 = false;
+	}
+	datass << "3 " << fov << " ";
+
 	std::cout << "1 " << viewdirection[0] << " " << viewdirection[1] << " " << viewdirection[2] << " " << fov << std::endl;
 	
 	zmq::message_t mssg (datass.str().length());
@@ -214,7 +243,19 @@ void Communicate::listen () {
 				memcpy(&viewdirection[2], &data[17], sizeof(double));
 				memcpy(&fov, &data[25], sizeof(double));
 */
-				datass >> viewdirection[0] >> viewdirection[1] >> viewdirection[2] >> fov;
+				int id;
+				datass >> id;
+				datass >> viewdirection[0] >> viewdirection[1] >> viewdirection[2] >> id;
+				if (id==1) {
+					vd1 = true;
+					datass >> viewdirection1[0] >> viewdirection1[1] >> viewdirection1[2] >> id;
+				}
+				if (id==2) {
+					f1 = true;
+					datass >> fov1 >> id;
+				}
+				if (id==3)
+					datass >> fov;
 
 				viewchanged = true;
 				mtx.unlock();
@@ -234,6 +275,14 @@ bool Communicate::read (StelMovementMgr* smm) {
 	if (mtx.try_lock()) {
 		if(true || viewchanged) {
 			smm->setViewDirectionJ2000(viewdirection);
+			if (f1) {
+				smm->setCFov(fov1);
+				f1 = false;
+			}
+			if (vd1) {
+				smm->setViewDirectionJ2000(viewdirection1);
+				vd1=false;
+			}
 			smm->setCFov(fov);
 			smm->setViewDirectionJ2000WithOffset(offset);
 			viewchanged = false;

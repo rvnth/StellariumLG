@@ -26,12 +26,14 @@ class Communicate {
 		};
 
 	private:
-		Vec3d viewdirection;
+		Vec3d viewdirection, viewdirection1;
 		Vec3d v3;
-		double fov;
+		double fov, fov1;
 		bool viewchanged;
 		bool listening;
 		std::mutex mtx;
+
+		bool vd1, f1;
 
 		MODE mode;
 		int offset;
@@ -61,7 +63,9 @@ class Communicate {
 		void connect (int offset);
 	
 		void write (double f);
+		void write1 (double f);
 		void write (Vec3d v);
+		void write1 (Vec3d v);
 		bool read (StelMovementMgr* smm);
 	
 		void send ();
