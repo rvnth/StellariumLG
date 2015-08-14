@@ -93,6 +93,7 @@ void Communicate::write (int i, double f) {
 }
 
 void Communicate::write (double f) {
+	std::cout << "Mode is " << mode << std::endl;
 	if (mode==SERVER) {
 		fov = f;
 		std::cout << "Setting fov = " << fov << " == " << f << std::endl;
