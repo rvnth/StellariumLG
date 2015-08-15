@@ -153,7 +153,7 @@ void Communicate::send () {
 		s->send (mssg);
 	}
 
-	bool currentatmosvis = GETSTELMODULE(Atmosphere)->getFlagShow();
+	bool currentatmosvis = GETSTELMODULE(LandscapeMgr)->getFlagAtmosphere();
 	if (atmosvis == currentatmosvis) {
 		atmosvis = currentatmosvis;
 		std::stringstream datass;
@@ -223,7 +223,7 @@ void Communicate::listen () {
 			case 2:
 				bool atmosvis;
 				datass >> atmosvis;
-				GETSTELMODULE(Atmosphere)->setFlagShow(atmosvis);
+				GETSTELMODULE(LandscapeMgr)->setFlagAtmosphere(atmosvis);
 				break;
 		}
 	}

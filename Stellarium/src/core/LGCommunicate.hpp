@@ -1,7 +1,7 @@
 #include "StelMovementMgr.hpp"
 #include "StelApp.hpp"
 #include "StelModuleMgr.hpp"
-#include "modules/Atmosphere.hpp"
+#include "modules/LandscapeMgr.hpp"
 #include <zmq.hpp>
 #include <mutex>
 #include <QThread>
