@@ -236,9 +236,10 @@ bool Communicate::read (StelMovementMgr* smm) {
 	if (mode!=CLIENT)
 		return false;
 
-	if (mtx.try_lock()) {
-//		mtx.lock();
+//	if (mtx.try_lock()) {
+//	if (viewchanged) {
 		if(viewchanged) {
+			mtx.lock();
 			smm->setViewDirectionJ2000(viewdirection);
 /*			if (f1) {
 //				smm->setCFov(fov1);
@@ -255,11 +256,11 @@ bool Communicate::read (StelMovementMgr* smm) {
 			return true;
 		} else {
 			std::cout << "VIEW DIR NOT AVAILABLE !!!" << std::endl;
-			mtx.unlock();
+//	mtx.unlock();
 			return false;
 		}
-	} else
-		return false;
+//	} else
+//		return false;
 }
 
 
