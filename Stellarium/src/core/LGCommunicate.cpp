@@ -240,7 +240,7 @@ bool Communicate::read (StelMovementMgr* smm) {
 //	if (viewchanged) {
 		if(viewchanged) {
 			mtx.lock();
-			smm->setViewDirectionJ2000(viewdirection);
+			smm->setViewDirectionJ2000(viewdirection, offset);
 /*			if (f1) {
 //				smm->setCFov(fov1);
 //				f1 = false;
