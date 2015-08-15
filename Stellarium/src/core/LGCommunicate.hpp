@@ -31,6 +31,9 @@ class Communicate {
 		Vec3d viewdirection, viewdirection1;
 		Vec3d v3;
 		double fov, fov1;
+		bool atmosvis;
+
+
 		bool viewchanged;
 		bool listening;
 		std::mutex mtx;

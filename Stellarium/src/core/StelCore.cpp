@@ -552,7 +552,7 @@ void StelCore::setCurrentStelProjectorParams(const StelProjector::StelProjectorP
 	currentProjectorParams=newParams;
 }
 
-void StelCore::lookAtJ2000(const Vec3d& pos, const Vec3d& aup)
+void StelCore::lookAtJ2000(const Vec3d& pos, const Vec3d& aup, int offset)
 {
 	Vec3d f(j2000ToAltAz(pos, RefractionOff));
 	Vec3d up(j2000ToAltAz(aup, RefractionOff));
@@ -564,13 +564,38 @@ void StelCore::lookAtJ2000(const Vec3d& pos, const Vec3d& aup)
 	s.normalize();
 	Vec3d u(s^f);	// Up vector in AltAz coordinates
 	u.normalize();
-	matAltAzModelView.set(s[0],u[0],-f[0],0.,
-			      s[1],u[1],-f[1],0.,
-			      s[2],u[2],-f[2],0.,
-			      0.,0.,0.,1.);
-	invertMatAltAzModelView = matAltAzModelView.inverse();
-}
 
+	if (offset == 0)
+	{
+		matAltAzModelView.set(s[0],u[0],-f[0],0.,
+				s[1],u[1],-f[1],0.,
+				s[2],u[2],-f[2],0.,
+				0.,0.,0.,1.);
+		invertMatAltAzModelView = matAltAzModelView.inverse();
+	} else {
+		// CurrentFov is vertical fov. Compute Horizontal FOV in Radians.
+		double hfov = movementMgr->getCurrentFov() * (double)currentProjectorParams.viewportXywh[2] / (double)currentProjectorParams.viewportXywh[3] * M_PI/180.;
+
+		// angular offset from original view = offset*hfov
+		// f1 - Rotated f vector about u vector by offset*hfov
+		// s1 - Rotated f vector about u vector by offset*hfov
+		double cv = cos((double)offset*hfov);
+		double sv = sin((double)offset*hfov);
+		Vec3d f1( u[0]*u.dot(f)*(1-cv) + f[0]*cv + (u[1]*f[2]-u[2]*f[1])*sv,
+			  u[1]*u.dot(f)*(1-cv) + f[1]*cv + (u[2]*f[0]-u[0]*f[2])*sv,
+			  u[2]*u.dot(f)*(1-cv) + f[2]*cv + (u[0]*f[1]-u[1]*f[0])*sv );
+		f1.normalize();
+		Vec3d s1(f1^u);
+		s1.normalize();
+
+		matAltAzModelView.set(s1[0],u[0],-f1[0],0.,
+				s1[1],u[1],-f1[1],0.,
+				s1[2],u[2],-f1[2],0.,
+				0.,0.,0.,1.);
+		invertMatAltAzModelView = matAltAzModelView.inverse();
+	}
+}
+/*
 void StelCore::lookAtJ2000WithOffset(const Vec3d& pos, const Vec3d& aup, int loc)
 {
 	Vec3d f(j2000ToAltAz(pos, RefractionOff));
@@ -583,13 +608,9 @@ void StelCore::lookAtJ2000WithOffset(const Vec3d& pos, const Vec3d& aup, int loc
 	s.normalize();
 	Vec3d u(s^f);	// Up vector in AltAz coordinates
 	u.normalize();
-/*	matAltAzModelView.set(s[0],u[0],-f[0],0.,
-			      s[1],u[1],-f[1],0.,
-			      s[2],u[2],-f[2],0.,
-			      0.,0.,0.,1.);
 
 	// Compute offset f and s vector
-*/	double hfov = movementMgr->getCurrentFov() * (double)currentProjectorParams.viewportXywh[2] / (double)currentProjectorParams.viewportXywh[3] * M_PI/180.;
+	double hfov = movementMgr->getCurrentFov() * (double)currentProjectorParams.viewportXywh[2] / (double)currentProjectorParams.viewportXywh[3] * M_PI/180.;
 	double cv = cos((double)loc*hfov);
 	double sv = sin((double)loc*hfov);
 	Vec3d f1(u[0]*u.dot(f)*(1-cv) + f[0]*cv + (u[1]*f[2]-u[2]*f[1])*sv,
@@ -605,7 +626,7 @@ void StelCore::lookAtJ2000WithOffset(const Vec3d& pos, const Vec3d& aup, int loc
 			      0.,0.,0.,1.);
 	invertMatAltAzModelView = matAltAzModelView.inverse();
 }
-
+*/
 
 Vec3d StelCore::altAzToEquinoxEqu(const Vec3d& v, RefractionMode refMode) const
 {

@@ -191,9 +191,9 @@ public:
 	//! Set the set of parameters to use when creating a new StelProjector.
 	void setCurrentStelProjectorParams(const StelProjector::StelProjectorParams& newParams);
 
-	//! Set vision direction
-	void lookAtJ2000(const Vec3d& pos, const Vec3d& up);
-	void lookAtJ2000WithOffset(const Vec3d& pos, const Vec3d& aup, int loc);
+	//! Set vision direction (with offset from original view for LG)
+	void lookAtJ2000(const Vec3d& pos, const Vec3d& up, int offset=0);
+//	void lookAtJ2000WithOffset(const Vec3d& pos, const Vec3d& aup, int loc);
 
 	Vec3d altAzToEquinoxEqu(const Vec3d& v, RefractionMode refMode=RefractionAuto) const;
 	Vec3d equinoxEquToAltAz(const Vec3d& v, RefractionMode refMode=RefractionAuto) const;

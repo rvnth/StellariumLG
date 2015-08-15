@@ -177,8 +177,8 @@ public slots:
 
 	//! Return the current viewing direction in equatorial J2000 frame.
 	Vec3d getViewDirectionJ2000() const {return viewDirectionJ2000;}
-	void setViewDirectionJ2000(const Vec3d& v);
-	void setViewDirectionJ2000WithOffset(int offset);
+	void setViewDirectionJ2000(const Vec3d& v, int offset=0);
+//	void setViewDirectionJ2000WithOffset(int offset);
 
 	//! Set the maximum field of View in degrees.
 	void setMaxFov(double max);

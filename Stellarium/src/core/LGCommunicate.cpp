@@ -132,8 +132,6 @@ void Communicate::send () {
 	memcpy ((void*)mssg.data(), data, 34);
 	s->send (mssg);
 */
-	std::stringstream datass;
-	datass << "1 " << viewdirection[0] << " " << viewdirection[1] << " " << viewdirection[2] << " " << fov << " ";
 /*	datass << "1 " << viewdirection[0] << " " << viewdirection[1] << " " << viewdirection[2] << " ";
 	if (vd1) {
 		datass << "1 " << viewdirection1[0] << " " << viewdirection1[1] << " " << viewdirection1[2] << " ";
@@ -146,10 +144,24 @@ void Communicate::send () {
 	datass << "3 " << fov << " ";
 */
 ///	std::cout << "100 " << viewdirection[0] << " " << viewdirection[1] << " " << viewdirection[2] << " " << fov << std::endl;
-	
-	zmq::message_t mssg (datass.str().length());
-	memcpy ((void*)mssg.data(), datass.str().c_str(), datass.str().length());
-	s->send (mssg);
+
+	{
+		std::stringstream datass;
+		datass << "1 " << viewdirection[0] << " " << viewdirection[1] << " " << viewdirection[2] << " " << fov << " ";
+		zmq::message_t mssg (datass.str().length());
+		memcpy ((void*)mssg.data(), datass.str().c_str(), datass.str().length());
+		s->send (mssg);
+	}
+
+	bool currentatmosvis = GETSTELMODULE(Atmosphere)->getFlagShow();
+	if (atmosvis == currentatmosvis) {
+		atmosvis = currentatmosvis;
+		std::stringstream datass;
+		datass << "2 " << atmosvis << " ";
+		zmq::message_t mssg (datass.str().length());
+		memcpy ((void*)mssg.data(), datass.str().c_str(), datass.str().length());
+		s->send (mssg);
+	}
 
 	// if (fov > 0);
 	// create prime message 00000002
@@ -221,8 +233,8 @@ bool Communicate::read (StelMovementMgr* smm) {
 	if (mode!=CLIENT)
 		return false;
 
-	if (true) {
-		mtx.lock();
+	if (mtx.try_lock()) {
+//		mtx.lock();
 		if(viewchanged) {
 			smm->setViewDirectionJ2000(viewdirection);
 /*			if (f1) {
@@ -234,7 +246,7 @@ bool Communicate::read (StelMovementMgr* smm) {
 //				vd1=false;
 //			}
 */			smm->setCFov(fov);
-			smm->setViewDirectionJ2000WithOffset(offset);
+//			smm->setViewDirectionJ2000WithOffset(offset);
 			viewchanged = false;
 			mtx.unlock();
 			return true;
