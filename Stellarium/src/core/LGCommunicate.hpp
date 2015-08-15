@@ -1,4 +1,7 @@
 #include "StelMovementMgr.hpp"
+#include "StelApp.hpp"
+#include "StelModuleMgr.hpp"
+#include "modules/Atmosphere.hpp"
 #include <zmq.hpp>
 #include <mutex>
 #include <QThread>
@@ -11,10 +14,9 @@
 
 class ListenerThread : public QThread
 {
-	    Q_OBJECT
-
+	Q_OBJECT
 	protected:
-		        void run();
+		void run();
 };
 
 class Communicate {
@@ -37,6 +39,7 @@ class Communicate {
 
 		MODE mode;
 		int offset;
+		std::string port;
 
 		zmq::context_t* ctx;; 
 		zmq::socket_t* s;
@@ -60,12 +63,10 @@ class Communicate {
 			return c;
 		}
 		void setMode (MODE m) { mode = m; }
-		void connect (int offset);
+		void connect (int _offset, std::string _port);
 	
 		void write (double f);
-		void write1 (double f);
 		void write (Vec3d v);
-		void write1 (Vec3d v);
 		bool read (StelMovementMgr* smm);
 	
 		void send ();
@@ -74,6 +75,8 @@ class Communicate {
 		void read (int i, StelMovementMgr* smm);
 		void write (int i, Vec3d v);
 		void write (int i, double f);
+///		void write1 (double f);
+///		void write1 (Vec3d v);
 };
 
 

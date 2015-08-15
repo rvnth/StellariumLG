@@ -6,39 +6,42 @@ void ListenerThread::run()
 }
 
 Communicate::Communicate (std::string _prefix) {
-	MAX_EVENTS = 300;
+/*	MAX_EVENTS = 300;
 	current = 0;
 	prefix = _prefix;
 	comm = false;
-
+*/
 	fov = 60;
 	viewchanged = false;
 	listening = true;
-
+	port="5000";
+/*
 	vd1 = false;
 	f1 = false;
-
+*/
 	ctx = new zmq::context_t(1); 
 	s = new zmq::socket_t(*ctx, ZMQ_PAIR);
 	Listener = new ListenerThread;
 
-
+/*
 	// Create thread for listen
 
 	//zmq::message_t rep;
 	//s->recv (&rep, 0);
 	//cout << "Received " << string((char*)rep.data(), rep.size()) << endl;
+*/
 }
 
 Communicate::~Communicate () { 
 	listening = false;
-	s->disconnect ("tcp://127.0.0.1:5000");
+	s->disconnect ("tcp://127.0.0.1:"+port);
 	s->close();
 }
 
-void Communicate::connect (int _offset) {
+void Communicate::connect (int _offset, std::string _port="5000") {
 	offset = _offset;
-	s->connect ("tcp://127.0.0.1:5000");
+	port = _port;
+	s->connect ("tcp://127.0.0.1:"+port);
 
 	std::stringstream data;
 	data<<"Stellarium Connection Established";
@@ -48,82 +51,21 @@ void Communicate::connect (int _offset) {
 	Listener->start();
 }
 
-//static Communicate& Communicate::instance () {
-//	static Communicate c("rstream", Communicate::SERVER);
-//	return c;
-//}
-
-void Communicate::write (int i, Vec3d v) {
-	if (mode!=SERVER)
-		return;
-	//viewdirection = v;
-	if (i==0) {
-		//cout << "WRITING " << current << endl;
-		std::stringstream ssw;
-		ssw << prefix << "_" << current << ".str";
-		current = (current+1)%MAX_EVENTS;
-		//file.open (ssw.str().c_str());
-	}
-	//file << i << " " << v[0] << " " << v[1] << " " << v[2] << endl;
-
-	std::stringstream reqss;
-	reqss << i << " " << v[0] << " " << v[1] << " " << v[2];
-	zmq::message_t req (reqss.str().length()+1);
-	memcpy ((void*)req.data(), (void*)reqss.str().c_str(), reqss.str().length());
-	s->send(req);
-
-
-	//zmq::message_t rep;
-	//s->recv (&rep, 0);
-	//cout << "Received " << string((char*)rep.data(), rep.size()) << endl;
-}
-
-void Communicate::write (int i, double f) {
-	if (mode!=SERVER)
-		return;
-	//fov = f;
-	//file << i << " " << f << endl;
-	if (i==3) {
-		//file.close();
-		//cout << "WRITTEN " << current << endl;
-	}
-
-	std::stringstream reqss;
-	reqss << i << " " << f;
-	zmq::message_t req (reqss.str().length()+1);
-	memcpy ((void*)req.data(), reqss.str().c_str(), reqss.str().length());
-	s->send (req);
-}
-
-void Communicate::write1 (double f) {
-	if (mode==SERVER) {
-		fov1 = f;
-		f1 = true;
-		std::cout << "Setting fov1 = " << fov1 << std::endl;
-	}
-}
-
 void Communicate::write (double f) {
-	std::cout << "Mode is " << mode << std::endl;
+///	std::cout << "Mode is " << mode << std::endl;
 	if (mode==SERVER) {
 		fov = f;
-		std::cout << "Setting fov = " << fov << " == " << f << std::endl;
-	}
-}
-
-void Communicate::write1 (Vec3d v) {
-	if (mode==SERVER) {
-		viewdirection1 = v;
-		vd1 = true;
+///		std::cout << "Setting fov = " << fov << " == " << f << std::endl;
 	}
 }
 
 void Communicate::write (Vec3d v) {
-	if (mode==SERVER)
+	if (mode==SERVER) {
 		viewdirection = v;
+	}
 }
 
-int sc = 0;
+///int sc = 0;
 
 void Communicate::send () {
 	if (mode!=SERVER)
@@ -191,8 +133,8 @@ void Communicate::send () {
 	s->send (mssg);
 */
 	std::stringstream datass;
-//	datass << "1 " << viewdirection[0] << " " << viewdirection[1] << " " << viewdirection[2] << " " << fov << " ";
-	datass << "1 " << viewdirection[0] << " " << viewdirection[1] << " " << viewdirection[2] << " ";
+	datass << "1 " << viewdirection[0] << " " << viewdirection[1] << " " << viewdirection[2] << " " << fov << " ";
+/*	datass << "1 " << viewdirection[0] << " " << viewdirection[1] << " " << viewdirection[2] << " ";
 	if (vd1) {
 		datass << "1 " << viewdirection1[0] << " " << viewdirection1[1] << " " << viewdirection1[2] << " ";
 		vd1 = false;
@@ -202,8 +144,8 @@ void Communicate::send () {
 		f1 = false;
 	}
 	datass << "3 " << fov << " ";
-
-	std::cout << "100 " << viewdirection[0] << " " << viewdirection[1] << " " << viewdirection[2] << " " << fov << std::endl;
+*/
+///	std::cout << "100 " << viewdirection[0] << " " << viewdirection[1] << " " << viewdirection[2] << " " << fov << std::endl;
 	
 	zmq::message_t mssg (datass.str().length());
 	memcpy ((void*)mssg.data(), datass.str().c_str(), datass.str().length());
@@ -224,9 +166,9 @@ void Communicate::listen () {
 		char* data = (char*)mssg.data();
 		std::string datas(data);
 		std::stringstream datass(datas);
-		int mid;
+		int mid=0;
 		datass >> mid;
-		std::cout << "INDEX:OFF " << offset << std::endl;
+///		std::cout << "INDEX:OFF " << offset << std::endl;
 //		switch(((unsigned char*)mssg.data())[0]) {
 		switch(mid) {
 			case 1:
@@ -243,7 +185,8 @@ void Communicate::listen () {
 				memcpy(&viewdirection[2], &data[17], sizeof(double));
 				memcpy(&fov, &data[25], sizeof(double));
 */
-				int id;
+				datass >> viewdirection[0] >> viewdirection[1] >> viewdirection[2] >> fov;
+/*				int id;
 				datass >> id;
 				datass >> viewdirection[0] >> viewdirection[1] >> viewdirection[2] >> id;
 				if (id==1) {
@@ -256,14 +199,19 @@ void Communicate::listen () {
 				}
 				if (id==3)
 					datass >> fov;
-
+*/
 				viewchanged = true;
 				mtx.unlock();
 //				std::cout << "DOUBLE: " << sizeof(double) << std::endl;
 //				for (int i=0; i<34; i++)
 //					std::cout << (int)data[i] << ", ";
 //				std::cout << std::endl;
-				std::cout<<"Listening: "<< viewdirection[0] << ", "<< viewdirection[1] << ", " << viewdirection[2] << " ... " << fov << std::endl;
+///				std::cout<<"Listening: "<< viewdirection[0] << ", "<< viewdirection[1] << ", " << viewdirection[2] << " ... " << fov << std::endl;
+				break;
+			case 2:
+				bool atmosvis;
+				datass >> atmosvis;
+				GETSTELMODULE(Atmosphere)->setFlagShow(atmosvis);
 				break;
 		}
 	}
@@ -272,11 +220,12 @@ void Communicate::listen () {
 bool Communicate::read (StelMovementMgr* smm) {
 	if (mode!=CLIENT)
 		return false;
+
 	if (true) {
 		mtx.lock();
 		if(viewchanged) {
 			smm->setViewDirectionJ2000(viewdirection);
-//			if (f1) {
+/*			if (f1) {
 //				smm->setCFov(fov1);
 //				f1 = false;
 //			}
@@ -284,7 +233,7 @@ bool Communicate::read (StelMovementMgr* smm) {
 //				smm->setViewDirectionJ2000(viewdirection);
 //				vd1=false;
 //			}
-			smm->setCFov(fov);
+*/			smm->setCFov(fov);
 			smm->setViewDirectionJ2000WithOffset(offset);
 			viewchanged = false;
 			mtx.unlock();
@@ -297,6 +246,12 @@ bool Communicate::read (StelMovementMgr* smm) {
 	} else
 		return false;
 }
+
+
+/* END OF USEFUL CODE */
+
+
+
 
 void Communicate::read (int i, StelMovementMgr* smm) {
 
@@ -398,3 +353,69 @@ void Communicate::read (int i, StelMovementMgr* smm) {
 	}
 	}*/
 }
+
+
+//static Communicate& Communicate::instance () {
+//	static Communicate c("rstream", Communicate::SERVER);
+//	return c;
+//}
+
+void Communicate::write (int i, Vec3d v) {
+	if (mode!=SERVER)
+		return;
+	//viewdirection = v;
+	if (i==0) {
+		//cout << "WRITING " << current << endl;
+		std::stringstream ssw;
+		ssw << prefix << "_" << current << ".str";
+		current = (current+1)%MAX_EVENTS;
+		//file.open (ssw.str().c_str());
+	}
+	//file << i << " " << v[0] << " " << v[1] << " " << v[2] << endl;
+
+	std::stringstream reqss;
+	reqss << i << " " << v[0] << " " << v[1] << " " << v[2];
+	zmq::message_t req (reqss.str().length()+1);
+	memcpy ((void*)req.data(), (void*)reqss.str().c_str(), reqss.str().length());
+	s->send(req);
+
+
+	//zmq::message_t rep;
+	//s->recv (&rep, 0);
+	//cout << "Received " << string((char*)rep.data(), rep.size()) << endl;
+}
+
+void Communicate::write (int i, double f) {
+	if (mode!=SERVER)
+		return;
+	//fov = f;
+	//file << i << " " << f << endl;
+	if (i==3) {
+		//file.close();
+		//cout << "WRITTEN " << current << endl;
+	}
+
+	std::stringstream reqss;
+	reqss << i << " " << f;
+	zmq::message_t req (reqss.str().length()+1);
+	memcpy ((void*)req.data(), reqss.str().c_str(), reqss.str().length());
+	s->send (req);
+}
+
+/*
+void Communicate::write1 (double f) {
+	if (mode==SERVER) {
+		fov1 = f;
+		f1 = true;
+		std::cout << "Setting fov1 = " << fov1 << std::endl;
+	}
+}
+
+void Communicate::write1 (Vec3d v) {
+	if (mode==SERVER) {
+		viewdirection1 = v;
+		vd1 = true;
+	}
+}
+*/
+

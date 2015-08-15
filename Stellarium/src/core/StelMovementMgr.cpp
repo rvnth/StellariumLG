@@ -130,15 +130,16 @@ void StelMovementMgr::init()
 	}
 
 	QString mode = conf->value("lg/mode","").toString();
+	QString port = conf->value("lg/port","5000").toString();
 	int lgoffset = conf->value("lg/offset",0).toInt();
-	std::cout << "Got offset " << lgoffset << std::endl;
+///	std::cout << "Got offset " << lgoffset << std::endl;
 	if (!mode.isEmpty()) {
 		if (mode == "SERVER") {
 			Communicate::instance().setMode(Communicate::SERVER);
-			Communicate::instance().connect(lgoffset);
+			Communicate::instance().connect(lgoffset, port.toStdString());
 		} else if (mode == "CLIENT") {
 			Communicate::instance().setMode(Communicate::CLIENT);
-			Communicate::instance().connect(lgoffset);
+			Communicate::instance().connect(lgoffset, port.toStdString());
 		} else 
 			Communicate::instance().setMode(Communicate::NONE);
 	} else
@@ -897,11 +898,11 @@ void StelMovementMgr::setViewDirectionJ2000(const Vec3d& v)
 	viewDirectionJ2000 = v;
 	viewDirectionMountFrame = j2000ToMountFrame(v);
 }
-void StelMovementMgr::setViewDirectionJ2000WithOffset(int loc)
+void StelMovementMgr::setViewDirectionJ2000WithOffset(int offset)
 {
 	Vec3d& v1 = viewDirectionJ2000;
-	std::cout << "STORED VAL = " << v1[0] << ", " << v1[1] << ", " << v1[2] << std::endl;
-	core->lookAtJ2000WithOffset(v1, getViewUpVectorJ2000(), loc);
+///	std::cout << "STORED VAL = " << v1[0] << ", " << v1[1] << ", " << v1[2] << std::endl;
+	core->lookAtJ2000WithOffset(v1, getViewUpVectorJ2000(), offset);
 //	viewDirectionJ2000 = v;
 //	viewDirectionMountFrame = j2000ToMountFrame(v);
 }

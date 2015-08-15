@@ -120,7 +120,7 @@ void CLIProcessor::parseCLIArgsPostConfig(const QStringList& argList, QSettings*
 	float fov;
 	QString landscapeId, homePlanet, longitude, latitude, skyDate, skyTime;
 	QString projectionType, screenshotDir, multiresImage, startupScript;
-	QString lgmode;
+	QString lgmode, lgport;
 	int lgoffset;
 	try
 	{
@@ -141,6 +141,7 @@ void CLIProcessor::parseCLIArgsPostConfig(const QStringList& argList, QSettings*
 		startupScript = argsGetOptionWithArg(argList, "", "--startup-script", "").toString();
 		lgmode = argsGetOptionWithArg(argList, "", "--lg", "").toString();
 		lgoffset = argsGetOptionWithArg(argList, "", "--lg-offset", 0).toInt();
+		lgport = argsGetOptionWithArg(argList, "", "--lg-port", "5000").toString();
 	}
 	catch (std::runtime_error& e)
 	{
@@ -160,9 +161,11 @@ void CLIProcessor::parseCLIArgsPostConfig(const QStringList& argList, QSettings*
 	if (!latitude.isEmpty()) confSettings->setValue("location_run_once/latitude", StelUtils::getDecAngle(latitude)); // Store latitude in radian
 	if (!lgmode.isEmpty()) {
 		confSettings->setValue("lg/mode", lgmode.toUpper());
+		confSettings->setValue("lg/port", lgport);
 		confSettings->setValue("lg/offset", lgoffset);
-		std::cout << "conf values : " << lgoffset << std::endl;
-	}
+///		std::cout << "conf values : " << lgmode.toStdString() << " " << lgoffset << std::endl;
+	} else
+		confSettings->setValue("lg/mode", "");
 
 	if (!skyDate.isEmpty() || !skyTime.isEmpty())
 	{
