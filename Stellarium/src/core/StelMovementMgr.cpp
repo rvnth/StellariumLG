@@ -131,6 +131,7 @@ void StelMovementMgr::init()
 
 	QString mode = conf->value("lg/mode","").toString();
 	int lgoffset = conf->value("lg/offset",0).toInt();
+	std::cout << "Got offset " << lgoffset << std::endl;
 	if (!mode.isEmpty()) {
 		if (mode == "SERVER") {
 			Communicate::instance().setMode(Communicate::SERVER);

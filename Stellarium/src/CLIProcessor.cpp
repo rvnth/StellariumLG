@@ -160,7 +160,8 @@ void CLIProcessor::parseCLIArgsPostConfig(const QStringList& argList, QSettings*
 	if (!latitude.isEmpty()) confSettings->setValue("location_run_once/latitude", StelUtils::getDecAngle(latitude)); // Store latitude in radian
 	if (!lgmode.isEmpty()) {
 		confSettings->setValue("lg/mode", lgmode.toUpper());
-		confSettings->setValue("lg/lgoffset", lgoffset);
+		confSettings->setValue("lg/offset", lgoffset);
+		std::cout << "conf values : " << lgoffset << std::endl;
 	}
 
 	if (!skyDate.isEmpty() || !skyTime.isEmpty())

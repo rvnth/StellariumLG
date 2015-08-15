@@ -226,7 +226,7 @@ void Communicate::listen () {
 		std::stringstream datass(datas);
 		int mid;
 		datass >> mid;
-		std::cout << "INDEX: " << mid << std::endl;
+		std::cout << "INDEX:OFF " << offset << std::endl;
 //		switch(((unsigned char*)mssg.data())[0]) {
 		switch(mid) {
 			case 1:
