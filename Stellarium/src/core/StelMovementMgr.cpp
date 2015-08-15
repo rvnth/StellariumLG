@@ -71,6 +71,7 @@ StelMovementMgr::StelMovementMgr(StelCore* acore)
 	, flagAutoZoom(0)
 	, flagAutoZoomOutResetsDirection(0)
 	, dragTriggerDistance(4.f)
+	, lgoffset(0)
 {
 	setObjectName("StelMovementMgr");
 	isDragging = false;
@@ -131,13 +132,15 @@ void StelMovementMgr::init()
 
 	QString mode = conf->value("lg/mode","").toString();
 	QString port = conf->value("lg/port","5000").toString();
-	int lgoffset = conf->value("lg/offset",0).toInt();
+	int _lgoffset = conf->value("lg/offset",0).toInt();
 ///	std::cout << "Got offset " << lgoffset << std::endl;
 	if (!mode.isEmpty()) {
 		if (mode == "SERVER") {
+			lgoffset = _lgoffset;
 			Communicate::instance().setMode(Communicate::SERVER);
-			Communicate::instance().connect(lgoffset, port.toStdString());
+			Communicate::instance().connect(_lgoffset, port.toStdString());
 		} else if (mode == "CLIENT") {
+			lgoffset = _lgoffset;
 			Communicate::instance().setMode(Communicate::CLIENT);
 			Communicate::instance().connect(lgoffset, port.toStdString());
 		} else 
@@ -892,12 +895,12 @@ Vec3d StelMovementMgr::mountFrameToJ2000(const Vec3d& v) const
 	return Vec3d(0);
 }
 
-void StelMovementMgr::setViewDirectionJ2000(const Vec3d& v, int offset)
+void StelMovementMgr::setViewDirectionJ2000(const Vec3d& v)
 {
-	if (offset == 0)
+	if (lgoffset == 0)
 		core->lookAtJ2000(v, getViewUpVectorJ2000());
 	else
-		core->lookAtJ2000(v, getViewUpVectorJ2000(), offset);
+		core->lookAtJ2000(v, getViewUpVectorJ2000(), lgoffset);
 
 	viewDirectionJ2000 = v;
 	viewDirectionMountFrame = j2000ToMountFrame(v);
