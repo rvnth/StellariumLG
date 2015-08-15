@@ -15,6 +15,7 @@ Communicate::Communicate (std::string _prefix) {
 	viewchanged = false;
 	listening = true;
 	port="5000";
+	atmosvis = true;
 /*
 	vd1 = false;
 	f1 = false;
@@ -154,7 +155,7 @@ void Communicate::send () {
 	}
 
 	bool currentatmosvis = GETSTELMODULE(LandscapeMgr)->getFlagAtmosphere();
-	if (atmosvis == currentatmosvis) {
+	if (atmosvis != currentatmosvis) {
 		atmosvis = currentatmosvis;
 		std::stringstream datass;
 		datass << "2 " << atmosvis << " ";
@@ -223,7 +224,9 @@ void Communicate::listen () {
 			case 2:
 				bool atmosvis;
 				datass >> atmosvis;
-				GETSTELMODULE(LandscapeMgr)->setFlagAtmosphere(atmosvis);
+				LandscapeMgr* lmr = (LandscapeMgr*)GETSTELMODULE(LandscapeMgr);
+				if (lmr)
+					lmr->setFlagAtmosphere(atmosvis);
 				break;
 		}
 	}
