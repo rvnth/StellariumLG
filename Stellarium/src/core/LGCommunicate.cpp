@@ -128,20 +128,21 @@ void LGCommunicate::sendTimeRate (double timeSpeed) {
 	zmq::message_t mssg (datass.str().length());
 	memcpy ((void*)mssg.data(), datass.str().c_str(), datass.str().length());
 	s->send (mssg);
+	std::cout << "SENDING  " << datass.str() << std::endl;
 }
 
 void LGCommunicate::sendTimeReset () {
 	std::stringstream datass;
-	datass << "3 "; 
+	datass << "4 "; 
 	zmq::message_t mssg (datass.str().length());
 	memcpy ((void*)mssg.data(), datass.str().c_str(), datass.str().length());
 	s->send (mssg);
+	std::cout << "SENDINGR " << datass.str() << std::endl;
 }
 
 void LGCommunicate::listen () {
 	if (mode!=CLIENT)
 		return;
-	LandscapeMgr* lmr = (LandscapeMgr*)GETSTELMODULE(LandscapeMgr);
 	while (listening) {
 		zmq::message_t mssg;
 		s->recv (&mssg, 0);
@@ -165,15 +166,24 @@ void LGCommunicate::listen () {
 				mtx.unlock();
 				break;
 			case 2:
-				bool atmosvis;
-				datass >> atmosvis;
-				if (lmr)
-					lmr->setFlagAtmosphere(atmosvis);
+				{
+					bool atmosvis;
+					datass >> atmosvis;
+					LandscapeMgr* lmr = (LandscapeMgr*)GETSTELMODULE(LandscapeMgr);
+					if (lmr)
+						lmr->setFlagAtmosphere(atmosvis);
+				}
 				break;
 			case 3:
-				double timeSpeed;
-				datass >> timeSpeed;
-				core->setTimeRate(timeSpeed);
+				{
+					double timeSpeed;
+					datass >> timeSpeed;
+					core->setTimeRate(timeSpeed);
+					std::cout << "RECEIVED " << timeSpeed << std::endl;
+				}
+				break;
+			case 4:
+				core->setTimeNow();
 				break;
 		}
 	}
