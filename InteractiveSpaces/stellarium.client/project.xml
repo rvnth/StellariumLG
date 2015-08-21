@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<project type="activity" builder="java">
+  <name>Stellarium Client</name>
+  <description>
+	Client Activity that communicates between Interactive Spaces and Stellarium Client Instance
+  </description>
+
+  <identifyingName>stellarium.client</identifyingName>
+  <version>0.0.1</version>
+
+  <activity type="interactivespaces_native" logLevel="info">
+    <name>stellarium.client</name>
+    <class>stellarium.client.StellariumClientActivity</class>
+
+    <configuration>
+    	<property name="space.nativeapplication.executable" required="true">
+    		<description>Stellarium Executable</description>
+	   	<!--value>/usr/bin/stellarium</value-->
+	   	<value>/home/i/Downloads/StellariumLG/Stellarium/build/src/stellarium</value>
+   	 </property>
+    	<property name="space.nativeapplication.executable.flags" required="false">
+    		<description>Flags for stellarium</description>
+    		<value>-f no --lg CLIENT --lg-offset 1</value>
+	</property>
+    
+    	<property name="space.activity.ros.node.name">
+    		<value>example/routable/input	</value>
+    	</property>
+    	<property name="space.activity.routes.inputs" value="MasterToClientChannel" />
+    	<property name="space.activity.route.input.MasterToClientChannel">
+    		<value>/example/routable/channel1</value>
+    	</property>
+    	<property name="space.activity.log.level" value="info" />
+    </configuration>
+
+  </activity>
+  
+</project>
+

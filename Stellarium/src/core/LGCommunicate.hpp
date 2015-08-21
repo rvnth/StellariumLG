@@ -38,12 +38,12 @@ class LGCommunicate;
 #include "StelModuleMgr.hpp"
 #include "modules/LandscapeMgr.hpp"
 
-class ListenerThread : public QThread
+class LGListenerThread : public QThread
 {
 	Q_OBJECT
 	public:
-		ListenerThread (LGCommunicate* _lgc) { lgc=_lgc; }
-		~ListenerThread () { }
+		LGListenerThread (LGCommunicate* _lgc) { lgc=_lgc; }
+		~LGListenerThread () { }
 	protected:
 		LGCommunicate* lgc;
 		void run();
@@ -60,17 +60,13 @@ class LGCommunicate : public QObject
 		};
 
 	private:
-		Vec3d viewdirection, viewdirection1;
-		Vec3d v3;
-		double fov, fov1;
+		Vec3d viewdirection;
+		double fov;
 		bool atmosvis;
-
 
 		bool viewchanged;
 		bool listening;
 		std::mutex mtx;
-
-		bool vd1, f1;
 
 		MODE mode;
 		int offset;
@@ -78,14 +74,14 @@ class LGCommunicate : public QObject
 
 		zmq::context_t* ctx;; 
 		zmq::socket_t* s;
-		ListenerThread* Listener;
+		LGListenerThread* Listener;
 
 		StelCore* core;
 		StelMovementMgr* mmgr;
 
 	public slots:
 		//! Send new time rate to clients
-		void sendTimeRate (double timeSpeed);
+		void sendTimeRate (double rate);
 		//! Send time reset to clients
 		void sendTimeReset ();
 
@@ -93,11 +89,7 @@ class LGCommunicate : public QObject
 		LGCommunicate (StelCore* _core, StelMovementMgr* _mmgr, MODE m=NONE, int _offset=0, std::string _port="5000");
 		~LGCommunicate ();
 		
-/*		static LGCommunicate& instance () {
-			static LGCommunicate c();
-			return c;
-		}
-*/		void setMode (MODE m) { mode = m; }
+		void setMode (MODE m) { mode = m; }
 		void connectSocket (int _offset, std::string _port="5000");
 	
 		void write (double f);
@@ -106,12 +98,6 @@ class LGCommunicate : public QObject
 	
 		void send ();
 		void listen ();
-		
-		void read (int i, StelMovementMgr* smm);
-		void write (int i, Vec3d v);
-		void write (int i, double f);
-///		void write1 (double f);
-///		void write1 (Vec3d v);
 };
 
 #endif // _LGCOMMUNICATE_HPP_

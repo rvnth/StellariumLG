@@ -1,6 +1,6 @@
 #include "LGCommunicate.hpp"
 
-void ListenerThread::run()
+void LGListenerThread::run()
 {
 	lgc->listen();
 }
@@ -19,7 +19,7 @@ LGCommunicate::LGCommunicate (StelCore* _core, StelMovementMgr* _mmgr, MODE m, i
 
 	ctx = new zmq::context_t(1); 
 	s = new zmq::socket_t(*ctx, ZMQ_PAIR);
-	Listener = new ListenerThread(this);
+	Listener = new LGListenerThread(this);
 
 	if (mode!=NONE)
 		connectSocket (_offset, _port);
@@ -28,15 +28,6 @@ LGCommunicate::LGCommunicate (StelCore* _core, StelMovementMgr* _mmgr, MODE m, i
 		QObject::connect ((const QObject*)core, SIGNAL(timeRateChanged(double)), this, SLOT(sendTimeRate(double)));
 		QObject::connect ((const QObject*)core, SIGNAL(timeReset()), this, SLOT(sendTimeReset()));
 	}
-				
-
-/*
-	// Create thread for listen
-
-	//zmq::message_t rep;
-	//s->recv (&rep, 0);
-	//cout << "Received " << string((char*)rep.data(), rep.size()) << endl;
-*/
 }
 
 LGCommunicate::~LGCommunicate () { 
@@ -59,15 +50,13 @@ void LGCommunicate::connectSocket (int _offset, std::string _port) {
 }
 
 void LGCommunicate::write (double f) {
-	if (mode==SERVER) {
+	if (mode==SERVER)
 		fov = f;
-	}
 }
 
 void LGCommunicate::write (Vec3d v) {
-	if (mode==SERVER) {
+	if (mode==SERVER)
 		viewdirection = v;
-	}
 }
 
 void LGCommunicate::send () {
@@ -115,11 +104,6 @@ void LGCommunicate::send () {
 		memcpy ((void*)mssg.data(), datass.str().c_str(), datass.str().length());
 		s->send (mssg);
 	}
-
-	// if (fov > 0);
-	// create prime message 00000002
-	// else
-	// create prime message 00000001
 }
 
 void LGCommunicate::sendTimeRate (double rate) {
@@ -128,7 +112,6 @@ void LGCommunicate::sendTimeRate (double rate) {
 	zmq::message_t mssg (datass.str().length());
 	memcpy ((void*)mssg.data(), datass.str().c_str(), datass.str().length());
 	s->send (mssg);
-	std::cout << "SENDING  " << datass.str() << std::endl;
 }
 
 void LGCommunicate::sendTimeReset () {
@@ -137,7 +120,6 @@ void LGCommunicate::sendTimeReset () {
 	zmq::message_t mssg (datass.str().length());
 	memcpy ((void*)mssg.data(), datass.str().c_str(), datass.str().length());
 	s->send (mssg);
-	std::cout << "SENDINGR " << datass.str() << std::endl;
 }
 
 void LGCommunicate::listen () {
@@ -179,7 +161,6 @@ void LGCommunicate::listen () {
 					double rate;
 					datass >> rate;
 					core->setTimeRate(rate);
-					std::cout << "RECEIVED " << rate << std::endl;
 				}
 				break;
 			case 4:
@@ -194,14 +175,13 @@ bool LGCommunicate::read () {
 		return false;
 
 	if(viewchanged && mtx.try_lock()) {
-		//			mtx.lock();
+		// mtx.lock();
 		mmgr->setViewDirectionJ2000(viewdirection);
 		mmgr->setCFov(fov);
 		viewchanged = false;
 		mtx.unlock();
 		return true;
 	} else {
-		std::cout << "VIEW DIR NOT AVAILABLE !!!" << std::endl;
 		return false;
 	}
 }
