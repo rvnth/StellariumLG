@@ -1,6 +1,12 @@
--------------------------------------------------------------------------------
-Installation
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+                   * * *    S T E L L A R I U M  L G    * * *
+--------------------------------------------------------------------------------
+       I m m e r s i v e  M u l t i  D i s p l a y  P l a n e t a r i u m      
+                                                                               
+
+--------------------------------------------------------------------------------
+ Installation
+--------------------------------------------------------------------------------
 Stellarium on Liquid Galaxy requires two basic components to be installed:
 - LG version of Stellarium
 - Interactive Spaces
@@ -40,9 +46,9 @@ Stellarium on Liquid Galaxy requires two basic components to be installed:
      controller. More information about creating OSGi bundles is provided in the
      Interactive Spaces documentation.
 
---------------------------------------------------------------------------------
-Configuration
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+ Configuration
+---------------------------------------------------------------------------------
 
 - The path to stellarium (generally /usr/local/bin/stellarium) should be updated
   in the project.xml file in "StellariumLG/InteractiveSpaces/stellarium.master"
