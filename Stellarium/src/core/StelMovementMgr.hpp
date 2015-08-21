@@ -23,6 +23,7 @@
 #include "StelModule.hpp"
 #include "StelProjector.hpp"
 #include "StelObjectType.hpp"
+#include "LGCommunicate.hpp"
 
 //! @class StelMovementMgr
 //! Manages the head movements and zoom operations.
@@ -337,7 +338,8 @@ private:
 	// Viewing direction in the mount reference frame.
 	Vec3d viewDirectionMountFrame;
 
-	int lgoffset;
+	LGCommunicate* lgc;  // Communication for LG setup
+	int lgoffset;        // Offset of this instance from LG master
 
 	Vec3d upVectorMountFrame;
 

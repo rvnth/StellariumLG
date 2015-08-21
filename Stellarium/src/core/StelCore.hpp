@@ -193,7 +193,6 @@ public:
 
 	//! Set vision direction (with offset from original view for LG)
 	void lookAtJ2000(const Vec3d& pos, const Vec3d& up, int offset=0);
-//	void lookAtJ2000WithOffset(const Vec3d& pos, const Vec3d& aup, int loc);
 
 	Vec3d altAzToEquinoxEqu(const Vec3d& v, RefractionMode refMode=RefractionAuto) const;
 	Vec3d equinoxEquToAltAz(const Vec3d& v, RefractionMode refMode=RefractionAuto) const;
@@ -528,6 +527,8 @@ signals:
 	void locationChanged(StelLocation);
 	//! This signal is emitted when the time rate has changed
 	void timeRateChanged(double rate);
+	//! This signal is emitted when the time is reset to now
+	void timeReset ();
 
 private:
 	StelToneReproducer* toneConverter;		// Tones conversion between stellarium world and display device

@@ -25,7 +25,6 @@
 #include "StelUtils.hpp"
 #include "StelTranslator.hpp"
 #include "ConstellationMgr.hpp"
-#include "LGCommunicate.hpp"
 
 #include <cmath>
 #include <QString>
@@ -137,16 +136,14 @@ void StelMovementMgr::init()
 	if (!mode.isEmpty()) {
 		if (mode == "SERVER") {
 			lgoffset = _lgoffset;
-			Communicate::instance().setMode(Communicate::SERVER);
-			Communicate::instance().connect(_lgoffset, port.toStdString());
+			lgc = new LGCommunicate (core, this, LGCommunicate::SERVER, lgoffset, port.toStdString());
 		} else if (mode == "CLIENT") {
 			lgoffset = _lgoffset;
-			Communicate::instance().setMode(Communicate::CLIENT);
-			Communicate::instance().connect(lgoffset, port.toStdString());
+			lgc = new LGCommunicate (core, this, LGCommunicate::CLIENT, lgoffset, port.toStdString());
 		} else 
-			Communicate::instance().setMode(Communicate::NONE);
+			lgc = new LGCommunicate (core, this, LGCommunicate::NONE);
 	} else
-		Communicate::instance().setMode(Communicate::NONE);
+		lgc = new LGCommunicate (core, this, LGCommunicate::NONE);
 
 	QString movementGroup = N_("Movement and Selection");
 	addAction("actionSwitch_Equatorial_Mount", N_("Miscellaneous"), N_("Switch between equatorial and azimuthal mount"), "equatorialMount", "Ctrl+M");
@@ -562,11 +559,9 @@ void StelMovementMgr::zoomOut(bool s)
 // Increment/decrement smoothly the vision field and position
 void StelMovementMgr::updateMotion(double deltaTime)
 {
-	if( Communicate::instance().read(this) )
+	if( lgc->read() )
 		return;
-	//Communicate::instance().read(0,this);
-	//Communicate::instance().read(1,this);
-//	return;
+	
 	updateVisionVector(deltaTime);
 
 	const StelProjectorP proj = core->getProjection(StelCore::FrameJ2000);
@@ -633,7 +628,7 @@ void StelMovementMgr::updateMotion(double deltaTime)
 	}
 	panView(deltaAz, deltaAlt);
 	updateAutoZoom(deltaTime);
-	Communicate::instance().send();
+	lgc->send();
 }
 
 
@@ -707,8 +702,7 @@ void StelMovementMgr::updateVisionVector(double deltaTime)
 		Vec3d tmp;
 		StelUtils::spheToRect(ra_now, de_now, tmp);
 		setViewDirectionJ2000(mountFrameToJ2000(tmp));
-		//Communicate::instance().write(0, mountFrameToJ2000(tmp));
-		Communicate::instance().write(mountFrameToJ2000(tmp));
+		lgc->write(mountFrameToJ2000(tmp));
 	}
 	else
 	{
@@ -716,8 +710,7 @@ void StelMovementMgr::updateVisionVector(double deltaTime)
 		{
 			Vec3d v = objectMgr->getSelectedObject()[0]->getAltAzPosAuto(core);
 			setViewDirectionJ2000(core->altAzToJ2000(v, StelCore::RefractionOff));
-			// Communicate::instance().write(0, core->altAzToJ2000(v, StelCore::RefractionOff));
-			Communicate::instance().write(core->altAzToJ2000(v, StelCore::RefractionOff));
+			lgc->write(core->altAzToJ2000(v, StelCore::RefractionOff));
 		}
 		else
 		{
@@ -725,15 +718,13 @@ void StelMovementMgr::updateVisionVector(double deltaTime)
 			{
 				// Recalc local vision vector
 				setViewDirectionJ2000(viewDirectionJ2000);
-				// Communicate::instance().write(0, viewDirectionJ2000);
-				Communicate::instance().write(viewDirectionJ2000);
+				lgc->write(viewDirectionJ2000);
 			}
 			else
 			{
 				// Vision vector locked to its position in the mountFrame
 				setViewDirectionJ2000(mountFrameToJ2000(viewDirectionMountFrame));
-				// Communicate::instance().write(0, mountFrameToJ2000(viewDirectionMountFrame));
-				Communicate::instance().write(mountFrameToJ2000(viewDirectionMountFrame));
+				lgc->write(mountFrameToJ2000(viewDirectionMountFrame));
 			}
 		}
 	}
@@ -938,8 +929,7 @@ void StelMovementMgr::panView(double deltaAz, double deltaAlt)
 		Vec3d tmp;
 		StelUtils::spheToRect(azVision, altVision, tmp);
 		setViewDirectionJ2000(mountFrameToJ2000(tmp));
-		// Communicate::instance().write(1, mountFrameToJ2000(tmp));
-		Communicate::instance().write(mountFrameToJ2000(tmp));
+		lgc->write(mountFrameToJ2000(tmp));
 	}
 }
 
@@ -1004,8 +994,7 @@ void StelMovementMgr::updateAutoZoom(double deltaTime)
 			setFov(zoomMove.aim);
 		}
 	}
-	Communicate::instance().write(currentFov);
-	// Communicate::instance().write(3, currentFov);
+	lgc->write(currentFov);
 }
 
 // Zoom to the given field of view
@@ -1025,8 +1014,7 @@ void StelMovementMgr::changeFov(double deltaFov)
 	// if we are zooming in or out
 	if (deltaFov) {
 		setFov(currentFov + deltaFov);
-		// Communicate::instance().write(1, currentFov);
-		Communicate::instance().write(currentFov);
+		lgc->write(currentFov);
 	}
 }
 
