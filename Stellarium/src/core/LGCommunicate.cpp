@@ -25,7 +25,7 @@ LGCommunicate::LGCommunicate (StelCore* _core, StelMovementMgr* _mmgr, MODE m, i
 		connectSocket (_offset, _port);
 
 	if (mode==SERVER) {
-		QObject::connect ((const QObject*)core, SIGNAL(timeRateChanged(timeSpeed)), this, SLOT(sendTimeRate(timeSpeed)));
+		QObject::connect ((const QObject*)core, SIGNAL(timeRateChanged(double)), this, SLOT(sendTimeRate(double)));
 		QObject::connect ((const QObject*)core, SIGNAL(timeReset()), this, SLOT(sendTimeReset()));
 	}
 				
@@ -122,9 +122,9 @@ void LGCommunicate::send () {
 	// create prime message 00000001
 }
 
-void LGCommunicate::sendTimeRate (double timeSpeed) {
+void LGCommunicate::sendTimeRate (double rate) {
 	std::stringstream datass;
-	datass << "3 " << timeSpeed << " ";
+	datass << "3 " << rate << " ";
 	zmq::message_t mssg (datass.str().length());
 	memcpy ((void*)mssg.data(), datass.str().c_str(), datass.str().length());
 	s->send (mssg);
@@ -176,10 +176,10 @@ void LGCommunicate::listen () {
 				break;
 			case 3:
 				{
-					double timeSpeed;
-					datass >> timeSpeed;
-					core->setTimeRate(timeSpeed);
-					std::cout << "RECEIVED " << timeSpeed << std::endl;
+					double rate;
+					datass >> rate;
+					core->setTimeRate(rate);
+					std::cout << "RECEIVED " << rate << std::endl;
 				}
 				break;
 			case 4:
